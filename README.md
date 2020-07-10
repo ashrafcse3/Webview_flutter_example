@@ -1,10 +1,13 @@
-# wiki_browser
+# Webview flutter example
 
-A new Flutter project.
+A flutter project. In this project , i added a splash screen, some basic functionalities about webview.
 
-## Getting Started
-
-This project is a starting point for a Flutter application.
+## Things implemented for webview:
+   - Go back page
+   - Go forward page
+   - Refresh the current page
+   - Share some text with other app
+   - Phone back button work with the website
 
 A few resources to get you started if this is your first Flutter project:
 
