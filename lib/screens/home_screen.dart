@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:share/share.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 const String websiteUrl = 'https://bdcabs.com';
 
@@ -17,23 +16,17 @@ class _HomeScreenState extends State<HomeScreen> {
   Completer<WebViewController> _completer = Completer<WebViewController>();
   WebViewController _webViewController;
 
-  RefreshController _refreshController =
-      RefreshController(initialRefresh: false);
-
-  void _onRefresh() async {
-    // monitor network fetch
-    await Future.delayed(Duration(milliseconds: 1000));
-    // if failed,use refreshFailed()
-    _refreshController.refreshCompleted();
-  }
-
-  void _onLoading() async {
-    // monitor network fetch
-    await Future.delayed(Duration(milliseconds: 1000));
-    // if failed,use loadFailed(),if no data return,use LoadNodata()
-    // items.add((items.length+1).toString());
-    if (mounted) setState(() {});
-    _refreshController.loadComplete();
+  @override
+  void initState() {
+    super.initState();
+    Timer(
+      Duration(seconds: 3),
+      () {
+        setState(() {
+          stackToView = 1;
+        });
+      },
+    );
   }
 
   num stackToView = 0;
@@ -96,6 +89,7 @@ class _HomeScreenState extends State<HomeScreen> {
             title: Text('BD cabs'),
             backgroundColor: Color(0xFF344955),
           ),
+          drawer: Drawer(),
           bottomNavigationBar: BottomNavigationBar(
             showSelectedLabels: false,
             showUnselectedLabels: false,
@@ -120,40 +114,14 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ],
           ),
-          body: SmartRefresher(
-            enablePullDown: true,
-            enablePullUp: true,
-            header: WaterDropHeader(),
-            footer: CustomFooter(
-              builder: (BuildContext context, LoadStatus mode) {
-                Widget body;
-                if (mode == LoadStatus.idle) {
-                  body = Text("pull up load");
-                } else if (mode == LoadStatus.loading) {
-                  body = CupertinoActivityIndicator();
-                } else if (mode == LoadStatus.failed) {
-                  body = Text("Load Failed!Click retry!");
-                } else if (mode == LoadStatus.canLoading) {
-                  body = Text("release to load more");
-                } else {
-                  body = Text("No more Data");
-                }
-                return Container(
-                  height: 20.0,
-                  child: Center(child: body),
-                );
-              },
-            ),
-            controller: _refreshController,
-            onRefresh: _onRefresh,
-            onLoading: _onLoading,
-            child: IndexedStack(
-              index: stackToView,
-              children: <Widget>[
-                Center(
-                  child: CircularProgressIndicator(),
-                ),
-                WebView(
+          body: IndexedStack(
+            index: stackToView,
+            children: <Widget>[
+              Center(
+                child: CircularProgressIndicator(),
+              ),
+              Expanded(
+                child: WebView(
                   initialUrl: websiteUrl,
                   javascriptMode: JavascriptMode.unrestricted,
                   onWebViewCreated: (webViewController) {
@@ -161,24 +129,22 @@ class _HomeScreenState extends State<HomeScreen> {
                     _webViewController = webViewController;
                   },
                   navigationDelegate: (request) async {
-                    if (await canLaunch(request.url)) {
+                    if (request.url.contains(websiteUrl, 0)) {
+                      return NavigationDecision.navigate;
+                    } else if (await canLaunch(request.url)) {
                       closeWebView();
                       launch(request.url);
                     }
                     return NavigationDecision.prevent;
                   },
-                  gestureNavigationEnabled: true,
                   onPageFinished: (_) async {
                     setState(() {
                       stackToView = 1;
                     });
                   },
-                  onWebResourceError: (webResourceError) {
-                    print(webResourceError.errorType);
-                  },
                 ),
-              ],
-            ),
+              ),
+            ],
           )),
     );
   }
