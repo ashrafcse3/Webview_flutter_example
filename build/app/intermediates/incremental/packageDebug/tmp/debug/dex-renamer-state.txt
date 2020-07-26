@@ -1,4 +1,4 @@
-#Sun Jul 26 20:12:59 BDT 2020
+#Sun Jul 26 21:34:39 BDT 2020
 base.0=/home/ashraf/_Program files/flutter_apps/Webview_flutter_example/build/app/intermediates/dex/debug/mergeDexDebug/out/classes.dex
 path.0=classes.dex
 renamed.0=classes.dex

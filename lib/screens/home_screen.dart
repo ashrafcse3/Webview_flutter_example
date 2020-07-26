@@ -82,14 +82,28 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Scaffold(
           backgroundColor: Colors.white,
           appBar: AppBar(
-            leading: Padding(
-              padding: const EdgeInsets.only(left: 8.0),
-              child: Image.asset('assets/images/taxi.png'),
-            ),
+            // leading: Padding(
+            //   padding: const EdgeInsets.only(left: 8.0),
+            //   child: Image.asset('assets/images/taxi.png'),
+            // ),
             title: Text('BD cabs'),
             backgroundColor: Color(0xFF344955),
           ),
-          drawer: Drawer(),
+          drawer: Drawer(
+              child: ListView(
+            children: [
+              DrawerHeader(
+                child: Center(
+                  child: Container(
+                    child: Text(
+                      "Sunflower 🌻",
+                      style: TextStyle(fontSize: 32),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          )),
           bottomNavigationBar: BottomNavigationBar(
             showSelectedLabels: false,
             showUnselectedLabels: false,
@@ -120,29 +134,27 @@ class _HomeScreenState extends State<HomeScreen> {
               Center(
                 child: CircularProgressIndicator(),
               ),
-              Expanded(
-                child: WebView(
-                  initialUrl: websiteUrl,
-                  javascriptMode: JavascriptMode.unrestricted,
-                  onWebViewCreated: (webViewController) {
-                    _completer.complete(webViewController);
-                    _webViewController = webViewController;
-                  },
-                  navigationDelegate: (request) async {
-                    if (request.url.contains(websiteUrl, 0)) {
-                      return NavigationDecision.navigate;
-                    } else if (await canLaunch(request.url)) {
-                      closeWebView();
-                      launch(request.url);
-                    }
-                    return NavigationDecision.prevent;
-                  },
-                  onPageFinished: (_) async {
-                    setState(() {
-                      stackToView = 1;
-                    });
-                  },
-                ),
+              WebView(
+                initialUrl: websiteUrl,
+                javascriptMode: JavascriptMode.unrestricted,
+                onWebViewCreated: (webViewController) {
+                  _completer.complete(webViewController);
+                  _webViewController = webViewController;
+                },
+                navigationDelegate: (request) async {
+                  if (request.url.contains(websiteUrl, 0)) {
+                    return NavigationDecision.navigate;
+                  } else if (await canLaunch(request.url)) {
+                    closeWebView();
+                    launch(request.url);
+                  }
+                  return NavigationDecision.prevent;
+                },
+                onPageFinished: (_) async {
+                  setState(() {
+                    stackToView = 1;
+                  });
+                },
               ),
             ],
           )),
